@@ -1,4 +1,5 @@
 const router = require('express').Router();
+// const { canTreatArrayAsAnd } = require('../../node_modules/sequelize/lib/utils');
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // The `/api/products` endpoint
@@ -6,17 +7,44 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // get all products
 router.get('/', (req, res) => {
   // find all products
-  // be sure to include its associated Category and Tag data
+  Product.findAll(
+    {
+      include: [{
+        model: Category,
+        attributes: ["category_name"]
+      },{
+        model: Tag,
+        attributes: ['tag_name']
+      }]
+    }
+  ).then(data => res.json(data))
+  .catch(err => {
+    console.log(err)
+    res.status(500).json(err)
+  })
 });
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+  Product.findOne({
+    where: {
+      id: req.params.id
+    }, include: [
+      {
+        model: Category,
+        attributes: ['category_name']
+      },{
+        model: Tag,
+        attributes: ["tag_name"]
+      }
+    ]
+  }).then(data => res.json(data))
+  .catch(err => {
+    console.log(err)
+    res.status(500).json(err)
+  })
 });
-
-// create new product
-router.post('/', (req, res) => {
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -25,6 +53,20 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
+// create new product
+router.post('/', (req, res) => {
+  
+  Product.create({
+    product_name: req.body.price_name,
+    price: req.body.product_price,
+    stock: req.body.product_price,
+    tagIds: req.body.product_tagIds
+  }).then(data => res.json(data))
+  .catch(err => {
+    console.log(err)
+    res.status(500).json(err)
+  })
+
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
