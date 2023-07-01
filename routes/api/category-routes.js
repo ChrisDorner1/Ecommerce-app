@@ -63,9 +63,7 @@ router.put("/:id", (req, res) => {
     }
   )
     .then((data) => {
-      if (!data) {
-        res.status(404).json({ message: "This category does not exist" });
-      }
+      res.json(data)
     })
     .catch((err) => {
       console.log(err);
@@ -81,9 +79,7 @@ router.delete("/:id", (req, res) => {
     },
   })
     .then((data) => {
-      if (!data) {
-        res.status(404).json({ message: "This category does not exist" });
-      }
+      res.json(data)
     })
     .catch((err) => {
       console.log(err);
